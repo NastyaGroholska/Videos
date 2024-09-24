@@ -1,4 +1,4 @@
-package com.ahrokholska.videos.ui.theme
+package com.ahrokholska.videos.presentation.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

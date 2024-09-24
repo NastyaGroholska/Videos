@@ -1,6 +1,5 @@
-package com.ahrokholska.videos.ui.theme
+package com.ahrokholska.videos.presentation.theme
 
-import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
