@@ -1,9 +1,16 @@
 package com.ahrokholska.videos.di
 
+import android.content.Context
+import androidx.room.Room
+import com.ahrokholska.videos.data.VideoRepositoryImpl
+import com.ahrokholska.videos.data.local.AppDatabase
 import com.ahrokholska.videos.data.network.VideoService
+import com.ahrokholska.videos.domain.VideoRepository
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -34,9 +41,18 @@ object AppModule {
     @Provides
     fun provideVideoService(retrofit: Retrofit) = retrofit.create<VideoService>()
 
+    @Provides
+    fun provideRoomDb(@ApplicationContext context: Context) = Room.databaseBuilder(
+        context, AppDatabase::class.java, "app_database"
+    ).build()
+
+    @Provides
+    fun provideVideoDao(db: AppDatabase) = db.videoDao()
+
     @Module
     @InstallIn(SingletonComponent::class)
     interface AppBindModule {
-
+        @Binds
+        fun bindVideoRepository(repository: VideoRepositoryImpl): VideoRepository
     }
 }
