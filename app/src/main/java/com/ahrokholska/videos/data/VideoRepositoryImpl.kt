@@ -6,6 +6,7 @@ import com.ahrokholska.videos.data.mappers.toEntity
 import com.ahrokholska.videos.data.network.VideoService
 import com.ahrokholska.videos.domain.VideoRepository
 import com.ahrokholska.videos.domain.model.Video
+import com.ahrokholska.videos.domain.model.VideoDetails
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -32,7 +33,7 @@ class VideoRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getVideoDetails(id: Int): Video = withContext(Dispatchers.IO) {
+    override suspend fun getVideoDetails(id: Int): VideoDetails = withContext(Dispatchers.IO) {
         videoDao.getVideoDetail(id).toDomain()
     }
 }
