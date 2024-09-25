@@ -42,13 +42,21 @@ fun VideoFullScreen(viewModel: VideoFullViewModel = hiltViewModel()) {
     VideoFullScreenContent(
         exoPlayer = viewModel.exoPlayer,
         hasPrevious = viewModel.hasPrevious.collectAsState().value,
-        hasNext = viewModel.hasNext.collectAsState().value
+        hasNext = viewModel.hasNext.collectAsState().value,
+        onPrevClick = viewModel::setPrevVideo,
+        onNextClick = viewModel::setNextVideo
     )
 }
 
 @OptIn(UnstableApi::class)
 @Composable
-fun VideoFullScreenContent(exoPlayer: ExoPlayer?, hasPrevious: Boolean, hasNext: Boolean) {
+fun VideoFullScreenContent(
+    exoPlayer: ExoPlayer?,
+    hasPrevious: Boolean,
+    hasNext: Boolean,
+    onPrevClick: () -> Unit = {},
+    onNextClick: () -> Unit = {}
+) {
     var isControllerVisible by rememberSaveable { mutableStateOf(true) }
     Scaffold { innerPadding ->
         Box(
@@ -83,7 +91,7 @@ fun VideoFullScreenContent(exoPlayer: ExoPlayer?, hasPrevious: Boolean, hasNext:
                     Icon(
                         modifier = Modifier
                             .clip(CircleShape)
-                            .clickable(enabled = hasPrevious) { }
+                            .clickable(enabled = hasPrevious) { onPrevClick() }
                             .padding(5.dp),
                         imageVector = Icons.Filled.SkipPrevious,
                         contentDescription = null,
@@ -92,7 +100,7 @@ fun VideoFullScreenContent(exoPlayer: ExoPlayer?, hasPrevious: Boolean, hasNext:
                     Icon(
                         modifier = Modifier
                             .clip(CircleShape)
-                            .clickable(enabled = hasNext) { }
+                            .clickable(enabled = hasNext) { onNextClick() }
                             .padding(5.dp),
                         imageVector = Icons.Filled.SkipNext,
                         contentDescription = null,

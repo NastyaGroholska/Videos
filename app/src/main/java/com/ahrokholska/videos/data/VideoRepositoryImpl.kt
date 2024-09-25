@@ -25,7 +25,7 @@ class VideoRepositoryImpl @Inject constructor(
     override suspend fun refreshVideos(): Result<Unit> = withContext(Dispatchers.IO) {
         try {
             val result = videoService.getVideos().videos
-            videoDao.insertAll(*result.map { it.toEntity() }.toTypedArray())
+            videoDao.refresh(result.map { it.toEntity() })
             Result.success(Unit)
         } catch (e: Exception) {
             if (e is CancellationException) throw e
