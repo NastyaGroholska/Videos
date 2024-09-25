@@ -3,4 +3,5 @@
 
     <!--HomeScreen-->
     <string name="no_data">No data</string>
+    <string name="videos_provided_by_pexels">Videos provided by Pexels</string>
 </resources>
