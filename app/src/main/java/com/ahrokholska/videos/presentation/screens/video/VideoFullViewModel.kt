@@ -23,6 +23,9 @@ class VideoFullViewModel @Inject constructor(
     private val id = savedStateHandle.get<Int>("id") ?: 0
     private val _firstId = MutableStateFlow(id)
     private val _lastId = MutableStateFlow(id)
+    private val _currentId = MutableStateFlow(id)
+    val currentId = _currentId.asStateFlow()
+    private val ids = MutableStateFlow(mutableListOf(id))
     private val _hasPrevious = MutableStateFlow(false)
     val hasPrevious = _hasPrevious.asStateFlow()
     private val _hasNext = MutableStateFlow(false)
@@ -66,6 +69,7 @@ class VideoFullViewModel @Inject constructor(
         settingVideo = true
         viewModelScope.launch {
             fun setPrevItem() {
+                _currentId.update { ids.value[exoPlayer.currentMediaItemIndex - 1] }
                 exoPlayer.seekToPreviousMediaItem()
                 _hasNext.update { true }
             }
@@ -73,6 +77,7 @@ class VideoFullViewModel @Inject constructor(
                 0 -> {
                     val firstId = _firstId.value
                     val video = getVideoDetailsUseCase(firstId)
+                    ids.update { it.apply { add(0, video.id) } }
                     launch {
                         exoPlayer.addMediaItem(0, MediaItem.fromUri(video.url))
                         setPrevItem()
@@ -99,6 +104,7 @@ class VideoFullViewModel @Inject constructor(
         settingVideo = true
         viewModelScope.launch {
             fun setNextItem() {
+                _currentId.update { ids.value[exoPlayer.currentMediaItemIndex + 1] }
                 exoPlayer.seekToNextMediaItem()
                 _hasPrevious.update { true }
             }
@@ -106,6 +112,7 @@ class VideoFullViewModel @Inject constructor(
                 exoPlayer.mediaItemCount - 1 -> {
                     val lastId = _lastId.value
                     val video = getVideoDetailsUseCase(lastId)
+                    ids.update { it.apply { add(video.id) } }
                     launch {
                         exoPlayer.addMediaItem(MediaItem.fromUri(video.url))
                         setNextItem()

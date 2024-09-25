@@ -1,5 +1,8 @@
 package com.ahrokholska.videos.presentation.screens.home
 
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -37,17 +40,35 @@ import coil.compose.SubcomposeAsyncImageContent
 import com.ahrokholska.videos.R
 import com.ahrokholska.videos.presentation.model.VideoUI
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun HomeScreen(onVideoClick: (Int) -> Unit, viewModel: HomeViewModel = hiltViewModel()) {
+fun HomeScreen(
+    onVideoClick: (Int) -> Unit,
+    viewModel: HomeViewModel = hiltViewModel(),
+    sharedTransitionScope: SharedTransitionScope,
+    animatedVisibilityScope: AnimatedVisibilityScope
+) {
     HomeScreenContent(
         videos = viewModel.videos.collectAsState().value,
-        onVideoClick = onVideoClick
+        onVideoClick = onVideoClick,
+        videoModifier = {
+            with(sharedTransitionScope) {
+                Modifier.sharedBounds(
+                    rememberSharedContentState(key = "video$it"),
+                    animatedVisibilityScope = animatedVisibilityScope
+                )
+            }
+        }
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreenContent(videos: List<VideoUI>?, onVideoClick: (Int) -> Unit = {}) {
+fun HomeScreenContent(
+    videos: List<VideoUI>?,
+    videoModifier: @Composable (Int) -> Modifier = { Modifier },
+    onVideoClick: (Int) -> Unit = {}
+) {
     Scaffold(
         topBar = {
             TopAppBar(title = {
@@ -88,7 +109,7 @@ fun HomeScreenContent(videos: List<VideoUI>?, onVideoClick: (Int) -> Unit = {}) 
             ) {
                 items(videos) { video ->
                     SubcomposeAsyncImage(
-                        modifier = Modifier.clickable { onVideoClick(video.id) },
+                        modifier = videoModifier(video.id).clickable { onVideoClick(video.id) },
                         model = video.imageURL,
                         loading = { CircularProgressIndicator() },
                         error = {

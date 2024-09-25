@@ -1,7 +1,11 @@
 package com.ahrokholska.videos.presentation.screens.video
 
+import android.os.Build
 import android.view.View
 import androidx.annotation.OptIn
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -37,14 +41,25 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
 
+@kotlin.OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun VideoFullScreen(viewModel: VideoFullViewModel = hiltViewModel()) {
+fun VideoFullScreen(
+    viewModel: VideoFullViewModel = hiltViewModel(),
+    sharedTransitionScope: SharedTransitionScope,
+    animatedVisibilityScope: AnimatedVisibilityScope
+) {
     VideoFullScreenContent(
         exoPlayer = viewModel.exoPlayer,
         hasPrevious = viewModel.hasPrevious.collectAsState().value,
         hasNext = viewModel.hasNext.collectAsState().value,
         onPrevClick = viewModel::setPrevVideo,
-        onNextClick = viewModel::setNextVideo
+        onNextClick = viewModel::setNextVideo,
+        videoModifier = with(sharedTransitionScope) {
+            Modifier.sharedBounds(
+                rememberSharedContentState(key = "video${viewModel.currentId.collectAsState().value}"),
+                animatedVisibilityScope = animatedVisibilityScope
+            )
+        }
     )
 }
 
@@ -54,18 +69,20 @@ fun VideoFullScreenContent(
     exoPlayer: ExoPlayer?,
     hasPrevious: Boolean,
     hasNext: Boolean,
+    videoModifier: Modifier = Modifier,
     onPrevClick: () -> Unit = {},
     onNextClick: () -> Unit = {}
 ) {
     var isControllerVisible by rememberSaveable { mutableStateOf(true) }
     Scaffold { innerPadding ->
         Box(
-            modifier = Modifier
+            modifier = videoModifier
                 .fillMaxSize()
                 .padding(innerPadding),
             contentAlignment = Alignment.Center
         ) {
             AndroidView(
+                modifier = Modifier.fillMaxSize(),
                 factory = { context ->
                     PlayerView(context).apply {
                         exoPlayer?.let {
@@ -75,9 +92,11 @@ fun VideoFullScreenContent(
                             setControllerAnimationEnabled(false)
                             isControllerFullyVisible
                             controllerShowTimeoutMs = 2000
+                            if (Build.VERSION.SDK_INT >= 29) {
+                                transitionAlpha = 0.5f
+                            }
                             setShowPreviousButton(false)
                             setShowNextButton(false)
-
                             setControllerVisibilityListener(
                                 PlayerView.ControllerVisibilityListener { visibility ->
                                     isControllerVisible = visibility == View.VISIBLE
