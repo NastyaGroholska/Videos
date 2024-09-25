@@ -14,14 +14,17 @@ interface VideoDao {
     fun getAll(): Flow<List<VideoEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertAll(vararg videos: VideoEntity)
+    suspend fun insertAll(vararg videos: VideoEntity)
 
     @Query("DELETE FROM video")
-    fun deleteAll()
+    suspend fun deleteAll()
 
     @Transaction
-    fun refresh(videos: List<VideoEntity>) {
+    suspend fun refresh(videos: List<VideoEntity>) {
         deleteAll()
         insertAll(*videos.toTypedArray())
     }
+
+    @Query("SELECT * FROM video WHERE id = :id")
+    suspend fun getVideoDetail(id: Int): VideoEntity
 }

@@ -11,10 +11,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
-import javax.inject.Singleton
 import kotlin.coroutines.cancellation.CancellationException
 
-@Singleton
 class VideoRepositoryImpl @Inject constructor(
     private val videoService: VideoService,
     private val videoDao: VideoDao
@@ -32,5 +30,9 @@ class VideoRepositoryImpl @Inject constructor(
             if (e is CancellationException) throw e
             Result.failure(e)
         }
+    }
+
+    override suspend fun getVideoDetails(id: Int): Video = withContext(Dispatchers.IO) {
+        videoDao.getVideoDetail(id).toDomain()
     }
 }

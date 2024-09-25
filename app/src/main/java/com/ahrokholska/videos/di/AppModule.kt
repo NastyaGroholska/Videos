@@ -17,13 +17,14 @@ import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.create
-
+import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
     @Provides
-    fun provideRetrofit() = Retrofit.Builder()
+    @Singleton
+    fun provideRetrofit(): Retrofit = Retrofit.Builder()
         .client(OkHttpClient.Builder().addInterceptor(Interceptor { chain ->
             chain.proceed(
                 chain.request().newBuilder()
@@ -39,20 +40,24 @@ object AppModule {
         .build()
 
     @Provides
+    @Singleton
     fun provideVideoService(retrofit: Retrofit) = retrofit.create<VideoService>()
 
     @Provides
+    @Singleton
     fun provideRoomDb(@ApplicationContext context: Context) = Room.databaseBuilder(
         context, AppDatabase::class.java, "app_database"
     ).build()
 
     @Provides
+    @Singleton
     fun provideVideoDao(db: AppDatabase) = db.videoDao()
 
     @Module
     @InstallIn(SingletonComponent::class)
     interface AppBindModule {
         @Binds
+        @Singleton
         fun bindVideoRepository(repository: VideoRepositoryImpl): VideoRepository
     }
 }

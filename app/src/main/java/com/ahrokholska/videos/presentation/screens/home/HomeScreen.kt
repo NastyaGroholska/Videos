@@ -34,14 +34,15 @@ import com.ahrokholska.videos.R
 import com.ahrokholska.videos.presentation.model.VideoUI
 
 @Composable
-fun HomeScreen(viewModel: HomeViewModel = hiltViewModel()) {
+fun HomeScreen(onVideoClick: (Int) -> Unit, viewModel: HomeViewModel = hiltViewModel()) {
     HomeScreenContent(
-        videos = viewModel.videos.collectAsState().value
+        videos = viewModel.videos.collectAsState().value,
+        onVideoClick = onVideoClick
     )
 }
 
 @Composable
-fun HomeScreenContent(videos: List<VideoUI>?) {
+fun HomeScreenContent(videos: List<VideoUI>?, onVideoClick: (Int) -> Unit = {}) {
     Scaffold { innerPadding ->
         if (videos == null) {
             Box(
@@ -71,7 +72,7 @@ fun HomeScreenContent(videos: List<VideoUI>?) {
             ) {
                 items(videos) { video ->
                     SubcomposeAsyncImage(
-                        modifier = Modifier.clickable { },
+                        modifier = Modifier.clickable { onVideoClick(video.id) },
                         model = video.imageURL,
                         loading = { CircularProgressIndicator() },
                         error = {

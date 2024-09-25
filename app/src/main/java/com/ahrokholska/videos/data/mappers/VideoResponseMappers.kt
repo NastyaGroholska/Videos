@@ -7,7 +7,7 @@ fun VideoResponse.toEntity() = VideoEntity(
     id = id,
     width = width,
     height = height,
-    url = url,
+    url = files.first().link,
     image = image,
     duration = duration
 )
