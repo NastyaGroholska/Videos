@@ -33,6 +33,10 @@ class VideoRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun getIsNoDataAvailable(): Boolean = withContext(Dispatchers.IO) {
+        videoDao.hasAnyData() == null
+    }
+
     override suspend fun getVideoDetails(id: Int): VideoDetails = withContext(Dispatchers.IO) {
         videoDao.getVideoDetail(id).toDomain()
     }

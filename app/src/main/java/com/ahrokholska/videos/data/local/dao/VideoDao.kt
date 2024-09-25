@@ -20,6 +20,9 @@ interface VideoDao {
     @Query("DELETE FROM video")
     suspend fun deleteAll()
 
+    @Query("SELECT 1 FROM video LIMIT 1")
+    suspend fun hasAnyData(): Int?
+
     @Transaction
     suspend fun refresh(videos: List<VideoEntity>) {
         deleteAll()

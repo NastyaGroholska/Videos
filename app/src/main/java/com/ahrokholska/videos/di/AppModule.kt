@@ -2,6 +2,7 @@ package com.ahrokholska.videos.di
 
 import android.content.Context
 import androidx.room.Room
+import androidx.work.WorkManager
 import com.ahrokholska.videos.data.VideoRepositoryImpl
 import com.ahrokholska.videos.data.local.AppDatabase
 import com.ahrokholska.videos.data.network.VideoService
@@ -52,6 +53,10 @@ object AppModule {
     @Provides
     @Singleton
     fun provideVideoDao(db: AppDatabase) = db.videoDao()
+
+    @Provides
+    @Singleton
+    fun provideWorkManager(@ApplicationContext context: Context) = WorkManager.getInstance(context)
 
     @Module
     @InstallIn(SingletonComponent::class)

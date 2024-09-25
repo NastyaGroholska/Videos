@@ -138,7 +138,7 @@ fun VideoFullScreenContent(
                     wasPlaying = exoPlayer.isPlaying
                     exoPlayer.pause()
                 }
-                if (event == Lifecycle.Event.ON_START) {
+                if (event == Lifecycle.Event.ON_RESUME) {
                     if (wasPlaying) {
                         isControllerVisible = false
                         exoPlayer.play()
